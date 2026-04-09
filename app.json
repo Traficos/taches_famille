@@ -16,6 +16,7 @@
       "supportsTablet": true
     },
     "android": {
+      "package": "com.tachefamille.app",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
@@ -25,6 +26,13 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [],
+    "extra": {
+      "eas": {
+        "projectId": "548fcdfa-6259-476c-95da-f5b0ea530937"
+      }
+    },
+    "owner": "matt_outdoor"
   }
 }
