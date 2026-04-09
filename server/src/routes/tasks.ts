@@ -110,6 +110,14 @@ export async function taskRoutes(app: FastifyInstance) {
     return { success: true };
   });
 
+  app.get('/completions/history/:profileId', async (request) => {
+    const { profileId } = request.params as { profileId: string };
+    const db = getDatabase();
+    return db.prepare(
+      "SELECT tc.*, t.name as task_name, t.points as task_points, t.icon as task_icon FROM task_completions tc JOIN tasks t ON t.id = tc.task_id WHERE tc.profile_id = ? ORDER BY tc.completed_at DESC LIMIT 100"
+    ).all(profileId);
+  });
+
   app.get('/completions/:profileId', async (request) => {
     const { profileId } = request.params as { profileId: string };
     const { date } = request.query as { date: string };
