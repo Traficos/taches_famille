@@ -1,3 +1,4 @@
+process.env.NODE_ENV = 'test';
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import { getDatabase, closeDatabase } from '../../src/db/database';

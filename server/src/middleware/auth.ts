@@ -1,7 +1,11 @@
 import jwt from 'jsonwebtoken';
 import { FastifyRequest, FastifyReply } from 'fastify';
 
-export const JWT_SECRET = process.env.JWT_SECRET ?? 'tache-famille-dev-secret-change-in-prod';
+const defaultSecret = 'tache-famille-dev-secret-change-in-prod';
+export const JWT_SECRET = process.env.JWT_SECRET ?? defaultSecret;
+if (!process.env.JWT_SECRET && process.env.NODE_ENV === 'production') {
+  throw new Error('JWT_SECRET environment variable is required in production');
+}
 
 export function createToken(familyId: number): string {
   return jwt.sign({ familyId }, JWT_SECRET, { expiresIn: '30d' });

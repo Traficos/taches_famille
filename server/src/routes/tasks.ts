@@ -16,7 +16,7 @@ export async function taskRoutes(app: FastifyInstance) {
     const db = getDatabase();
     return db.prepare(
       `SELECT * FROM tasks WHERE family_id = ? AND active = 1
-       AND ((type = 'assigned' AND assigned_to = ?) OR (type = 'free' AND assigned_to = ?))
+       AND ((type = 'assigned' AND assigned_to = ?) OR (type = 'free' AND (assigned_to = ? OR assigned_to IS NULL)))
        ORDER BY name`
     ).all(familyId, childId, childId);
   });
@@ -85,10 +85,10 @@ export async function taskRoutes(app: FastifyInstance) {
     const { id } = request.params as { id: string };
     const { profileId } = request.query as { profileId: string };
     const db = getDatabase();
-    const today = new Date().toISOString().split('T')[0];
+    const startOfDay = new Date().toISOString().split('T')[0] + 'T00:00:00';
     const row = db.prepare(
-      "SELECT COUNT(*) as count FROM task_completions WHERE task_id = ? AND profile_id = ? AND completed_at >= ? || 'T00:00:00'"
-    ).get(id, profileId, today) as { count: number };
+      "SELECT COUNT(*) as count FROM task_completions WHERE task_id = ? AND profile_id = ? AND completed_at >= ?"
+    ).get(id, profileId, startOfDay) as { count: number };
     return { completed: row.count > 0 };
   });
 
@@ -104,26 +104,39 @@ export async function taskRoutes(app: FastifyInstance) {
   });
 
   app.delete('/:id/completions/:completionId', async (request) => {
+    const familyId = (request as any).familyId;
     const { completionId } = request.params as { id: string; completionId: string };
     const db = getDatabase();
-    db.prepare('DELETE FROM task_completions WHERE id = ?').run(completionId);
+    db.prepare(
+      'DELETE FROM task_completions WHERE id = ? AND profile_id IN (SELECT id FROM profiles WHERE family_id = ?)'
+    ).run(completionId, familyId);
     return { success: true };
   });
 
   app.get('/completions/history/:profileId', async (request) => {
+    const familyId = (request as any).familyId;
     const { profileId } = request.params as { profileId: string };
     const db = getDatabase();
+    // Verify profile belongs to this family
+    const profile = db.prepare('SELECT id FROM profiles WHERE id = ? AND family_id = ?').get(profileId, familyId);
+    if (!profile) return [];
     return db.prepare(
       "SELECT tc.*, t.name as task_name, t.points as task_points, t.icon as task_icon FROM task_completions tc JOIN tasks t ON t.id = tc.task_id WHERE tc.profile_id = ? ORDER BY tc.completed_at DESC LIMIT 100"
     ).all(profileId);
   });
 
   app.get('/completions/:profileId', async (request) => {
+    const familyId = (request as any).familyId;
     const { profileId } = request.params as { profileId: string };
     const { date } = request.query as { date: string };
     const db = getDatabase();
+    // Verify profile belongs to this family
+    const profile = db.prepare('SELECT id FROM profiles WHERE id = ? AND family_id = ?').get(profileId, familyId);
+    if (!profile) return [];
+    const startOfDay = `${date}T00:00:00`;
+    const endOfDay = `${date}T23:59:59`;
     return db.prepare(
-      "SELECT tc.*, t.name as task_name, t.points as task_points, t.icon as task_icon FROM task_completions tc JOIN tasks t ON t.id = tc.task_id WHERE tc.profile_id = ? AND tc.completed_at >= ? || 'T00:00:00' AND tc.completed_at <= ? || 'T23:59:59' ORDER BY tc.completed_at DESC"
-    ).all(profileId, date, date);
+      "SELECT tc.*, t.name as task_name, t.points as task_points, t.icon as task_icon FROM task_completions tc JOIN tasks t ON t.id = tc.task_id WHERE tc.profile_id = ? AND tc.completed_at >= ? AND tc.completed_at <= ? ORDER BY tc.completed_at DESC"
+    ).all(profileId, startOfDay, endOfDay);
   });
 }
