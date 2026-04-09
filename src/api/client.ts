@@ -35,6 +35,10 @@ export async function apiFetch<T>(path: string, options: RequestInit = {}): Prom
   }
   const res = await fetch(`${API_URL}${path}`, { ...options, headers });
   if (!res.ok) {
+    if (res.status === 401) {
+      await clearToken();
+      throw new Error('Session expiree, veuillez vous reconnecter');
+    }
     const body = await res.json().catch(() => ({}));
     throw new Error(body.error ?? `Erreur ${res.status}`);
   }

@@ -11,8 +11,11 @@ import { authGuard } from './middleware/auth';
 const app = Fastify({ logger: true });
 
 async function start() {
+  const allowedOrigins = process.env.CORS_ORIGINS
+    ? process.env.CORS_ORIGINS.split(',')
+    : ['http://localhost:8081', 'http://localhost:19006'];
   await app.register(cors, {
-    origin: true,
+    origin: allowedOrigins,
   });
 
   // Routes publiques (pas de JWT)

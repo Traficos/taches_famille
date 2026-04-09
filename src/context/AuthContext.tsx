@@ -24,7 +24,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     (async () => {
       const token = await getToken();
-      setIsAuthenticated(!!token);
+      if (!token) {
+        setIsAuthenticated(false);
+        setIsLoading(false);
+        return;
+      }
+      try {
+        await apiFetch('/profiles');
+        setIsAuthenticated(true);
+      } catch {
+        await clearToken();
+        setIsAuthenticated(false);
+      }
       setIsLoading(false);
     })();
   }, []);
