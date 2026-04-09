@@ -86,8 +86,14 @@ export async function rewardRoutes(app: FastifyInstance) {
   });
 
   app.put('/vouchers/:id/use', async (request) => {
+    const familyId = (request as any).familyId;
     const { id } = request.params as { id: string };
     const db = getDatabase();
+    // Verify voucher belongs to this family
+    const voucher = db.prepare(
+      'SELECT pr.id FROM purchased_rewards pr JOIN rewards r ON r.id = pr.reward_id WHERE pr.id = ? AND r.family_id = ?'
+    ).get(id, familyId);
+    if (!voucher) return { error: 'Bon non trouve' };
     db.prepare('UPDATE purchased_rewards SET used = 1 WHERE id = ?').run(id);
     return { success: true };
   });
