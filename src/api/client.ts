@@ -2,7 +2,7 @@ import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const DEV_URL = Platform.OS === 'web' ? 'http://localhost:3000' : 'http://192.168.1.1:3000';
-export const API_URL = __DEV__ ? DEV_URL : 'https://api.tachefamille.fr';
+export const API_URL = __DEV__ ? DEV_URL : 'https://traficos.freeboxos.fr/api';
 
 const TOKEN_KEY = 'auth_token';
 
