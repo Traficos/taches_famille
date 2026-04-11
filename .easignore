@@ -1,0 +1,11 @@
+# Server (deployed separately)
+server/
+
+# Docs
+docs/
+
+# Tests
+__tests__/
+
+# Git
+.git/
