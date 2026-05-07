@@ -19,10 +19,6 @@ export interface Voucher {
   reward_cost: number;
 }
 
-export async function getAllRewards(): Promise<Reward[]> {
-  return apiFetch<Reward[]>('/rewards');
-}
-
 export async function getRealRewards(): Promise<Reward[]> {
   return apiFetch<Reward[]>('/rewards/real');
 }
