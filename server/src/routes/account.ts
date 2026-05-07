@@ -40,5 +40,42 @@ export async function accountRoutes(app: FastifyInstance) {
     db.prepare('UPDATE families SET password_hash = ? WHERE id = ?').run(newHash, familyId);
     return { ok: true };
   });
-  // DELETE /account — implémenté en Task 4
+  app.delete('/', async (request, reply) => {
+    const familyId = (request as any).familyId;
+    const { password } = request.body as { password?: string };
+    if (!password) {
+      return reply.status(400).send({ error: 'Mot de passe requis' });
+    }
+    const db = getDatabase();
+    const family = db.prepare('SELECT * FROM families WHERE id = ?').get(familyId) as Family | undefined;
+    if (!family) {
+      return reply.status(404).send({ error: 'Famille introuvable' });
+    }
+    const valid = await bcrypt.compare(password, family.password_hash);
+    if (!valid) {
+      return reply.status(401).send({ error: 'Mot de passe incorrect' });
+    }
+
+    db.exec('BEGIN');
+    try {
+      db.prepare(
+        'DELETE FROM purchased_rewards WHERE profile_id IN (SELECT id FROM profiles WHERE family_id = ?)'
+      ).run(familyId);
+      db.prepare(
+        'DELETE FROM task_completions WHERE profile_id IN (SELECT id FROM profiles WHERE family_id = ?)'
+      ).run(familyId);
+      db.prepare(
+        'DELETE FROM penalties WHERE profile_id IN (SELECT id FROM profiles WHERE family_id = ?)'
+      ).run(familyId);
+      db.prepare('DELETE FROM tasks WHERE family_id = ?').run(familyId);
+      db.prepare('DELETE FROM rewards WHERE family_id = ?').run(familyId);
+      db.prepare('DELETE FROM profiles WHERE family_id = ?').run(familyId);
+      db.prepare('DELETE FROM families WHERE id = ?').run(familyId);
+      db.exec('COMMIT');
+    } catch (err) {
+      db.exec('ROLLBACK');
+      throw err;
+    }
+    return reply.status(204).send();
+  });
 }
