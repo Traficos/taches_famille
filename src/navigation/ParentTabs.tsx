@@ -48,6 +48,14 @@ export default function ParentTabs() {
         headerTitleStyle: { fontSize: 18, fontWeight: '700', color: COLORS.textPrimary },
         headerStyle: { backgroundColor: COLORS.parentBg },
         headerShadowVisible: false,
+        headerLeft: () => (
+          <TouchableOpacity
+            onPress={() => navigation.navigate('Account')}
+            style={styles.gearBtn}
+          >
+            <Text style={styles.gearText}>⚙️</Text>
+          </TouchableOpacity>
+        ),
         headerRight: () => (
           <TouchableOpacity onPress={handleLogout} style={styles.logoutBtn}>
             <Text style={styles.logoutText}>← Profils</Text>
@@ -77,6 +85,8 @@ export default function ParentTabs() {
 const styles = StyleSheet.create({
   logoutBtn: { marginRight: 16, paddingVertical: 6, paddingHorizontal: 12 },
   logoutText: { fontSize: 15, color: '#666', fontWeight: '500' },
+  gearBtn: { marginLeft: 16, paddingVertical: 6, paddingHorizontal: 8 },
+  gearText: { fontSize: 22 },
   pill: { flexDirection: 'row', alignItems: 'center', paddingVertical: 6, paddingHorizontal: 10, borderRadius: 16 },
   pillActive: { backgroundColor: '#4ECDC420' },
   emoji: { fontSize: 20 },
