@@ -44,8 +44,8 @@ export interface Reward {
   family_id: number;
   name: string;
   cost: number;
-  type: 'real' | 'accessory';
-  accessory_key: string | null;
+  type: 'real';
+  accessory_key: null;
 }
 
 export interface PurchasedReward {

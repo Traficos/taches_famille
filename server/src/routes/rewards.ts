@@ -18,23 +18,13 @@ export async function rewardRoutes(app: FastifyInstance) {
     ).all(familyId);
   });
 
-  app.get('/accessories', async (request) => {
-    const familyId = (request as any).familyId;
-    const db = getDatabase();
-    return db.prepare(
-      "SELECT * FROM rewards WHERE family_id = ? AND type = 'accessory' ORDER BY cost ASC"
-    ).all(familyId);
-  });
-
   app.post('/', async (request, reply) => {
     const familyId = (request as any).familyId;
-    const { name, cost, type, accessoryKey } = request.body as {
-      name: string; cost: number; type: 'real' | 'accessory'; accessoryKey?: string;
-    };
+    const { name, cost } = request.body as { name: string; cost: number };
     const db = getDatabase();
     const result = db.prepare(
-      'INSERT INTO rewards (family_id, name, cost, type, accessory_key) VALUES (?, ?, ?, ?, ?)'
-    ).run(familyId, name, cost, type, accessoryKey ?? null);
+      "INSERT INTO rewards (family_id, name, cost, type, accessory_key) VALUES (?, ?, ?, 'real', NULL)"
+    ).run(familyId, name, cost);
     return reply.status(201).send({ id: result.lastInsertRowid });
   });
 
@@ -71,18 +61,6 @@ export async function rewardRoutes(app: FastifyInstance) {
        WHERE pr.profile_id = ? AND r.family_id = ? AND r.type = 'real'
        ORDER BY pr.purchased_at DESC`
     ).all(childId, familyId);
-  });
-
-  app.get('/accessories-owned/:childId', async (request) => {
-    const familyId = (request as any).familyId;
-    const { childId } = request.params as { childId: string };
-    const db = getDatabase();
-    const rows = db.prepare(
-      `SELECT r.accessory_key FROM purchased_rewards pr
-       JOIN rewards r ON r.id = pr.reward_id
-       WHERE pr.profile_id = ? AND r.family_id = ? AND r.type = 'accessory'`
-    ).all(childId, familyId) as { accessory_key: string }[];
-    return rows.map(r => r.accessory_key);
   });
 
   app.put('/vouchers/:id/use', async (request) => {

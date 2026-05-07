@@ -47,7 +47,7 @@ function headers() {
 test('POST /rewards cree une recompense', async () => {
   const res = await app.inject({
     method: 'POST', url: '/rewards', headers: headers(),
-    payload: { name: 'Sortie cinema', cost: 100, type: 'real' },
+    payload: { name: 'Sortie cinema', cost: 100 },
   });
   expect(res.statusCode).toBe(201);
   expect(res.json().id).toBeDefined();
@@ -56,7 +56,7 @@ test('POST /rewards cree une recompense', async () => {
 test('GET /rewards retourne les recompenses de la famille', async () => {
   await app.inject({
     method: 'POST', url: '/rewards', headers: headers(),
-    payload: { name: 'Sortie cinema', cost: 100, type: 'real' },
+    payload: { name: 'Sortie cinema', cost: 100 },
   });
   const res = await app.inject({ method: 'GET', url: '/rewards', headers: headers() });
   expect(res.json()).toHaveLength(1);
@@ -65,7 +65,7 @@ test('GET /rewards retourne les recompenses de la famille', async () => {
 test('POST /rewards/:id/purchase cree un achat', async () => {
   const reward = await app.inject({
     method: 'POST', url: '/rewards', headers: headers(),
-    payload: { name: 'Sortie cinema', cost: 100, type: 'real' },
+    payload: { name: 'Sortie cinema', cost: 100 },
   });
   const rewardId = reward.json().id;
   const res = await app.inject({
@@ -79,7 +79,7 @@ test('POST /rewards/:id/purchase cree un achat', async () => {
 test('GET /rewards/vouchers/:childId retourne les bons', async () => {
   const reward = await app.inject({
     method: 'POST', url: '/rewards', headers: headers(),
-    payload: { name: 'Sortie cinema', cost: 100, type: 'real' },
+    payload: { name: 'Sortie cinema', cost: 100 },
   });
   await app.inject({
     method: 'POST', url: `/rewards/${reward.json().id}/purchase`, headers: headers(),
@@ -95,7 +95,7 @@ test('GET /rewards/vouchers/:childId retourne les bons', async () => {
 test('DELETE /rewards/:id supprime une recompense', async () => {
   const reward = await app.inject({
     method: 'POST', url: '/rewards', headers: headers(),
-    payload: { name: 'Test', cost: 50, type: 'real' },
+    payload: { name: 'Test', cost: 50 },
   });
   await app.inject({ method: 'DELETE', url: `/rewards/${reward.json().id}`, headers: headers() });
   const list = await app.inject({ method: 'GET', url: '/rewards', headers: headers() });
