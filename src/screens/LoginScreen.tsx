@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, StyleSheet, Alert, ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { useAuth } from '../context/AuthContext';
+import GameButton from '../components/GameButton';
+import { COLORS } from '../constants/colors';
 
 export default function LoginScreen() {
   const { login, register } = useAuth();
@@ -33,55 +35,89 @@ export default function LoginScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Tache Famille</Text>
-      <Text style={styles.subtitle}>{isRegister ? 'Creer un compte' : 'Connexion'}</Text>
+    <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
+      <View style={styles.header}>
+        <Text style={styles.headerEmoji}>🏠</Text>
+        <Text style={styles.headerTitle}>Tache Famille</Text>
+        <Text style={styles.headerSubtitle}>L'aventure des taches commence ici !</Text>
+      </View>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-        autoCapitalize="none"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Mot de passe"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-      />
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.formWrapper}>
+        <View style={styles.formCard}>
+          <Text style={styles.formTitle}>{isRegister ? 'Creer un compte' : 'Connexion'}</Text>
 
-      <TouchableOpacity style={styles.button} onPress={handleSubmit} disabled={loading}>
-        {loading ? (
-          <ActivityIndicator color="#fff" />
-        ) : (
-          <Text style={styles.buttonText}>{isRegister ? "S'inscrire" : 'Se connecter'}</Text>
-        )}
-      </TouchableOpacity>
+          <TextInput
+            style={styles.input}
+            placeholder="📧  Email"
+            placeholderTextColor="#bbb"
+            value={email}
+            onChangeText={setEmail}
+            keyboardType="email-address"
+            autoCapitalize="none"
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="🔒  Mot de passe"
+            placeholderTextColor="#bbb"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+          />
 
-      <TouchableOpacity onPress={() => setIsRegister(!isRegister)}>
-        <Text style={styles.link}>
-          {isRegister ? 'Deja un compte ? Se connecter' : 'Pas de compte ? Creer un compte'}
-        </Text>
-      </TouchableOpacity>
-    </View>
+          {loading ? (
+            <ActivityIndicator size="large" color={COLORS.coral} style={{ marginTop: 12 }} />
+          ) : (
+            <GameButton
+              label={isRegister ? "Creer mon compte 🚀" : "C'est parti ! 🚀"}
+              variant="primary"
+              onPress={handleSubmit}
+              style={{ marginTop: 12 }}
+            />
+          )}
+
+          <Text
+            style={styles.link}
+            onPress={() => setIsRegister(!isRegister)}
+          >
+            {isRegister ? 'Deja un compte ? Se connecter' : 'Pas de compte ? Creer un compte'}
+          </Text>
+        </View>
+      </KeyboardAvoidingView>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', padding: 32, backgroundColor: '#f5f5f5' },
-  title: { fontSize: 32, fontWeight: 'bold', textAlign: 'center', color: '#4CAF50', marginBottom: 8 },
-  subtitle: { fontSize: 18, textAlign: 'center', color: '#666', marginBottom: 32 },
+  scroll: { flexGrow: 1, backgroundColor: COLORS.turquoise },
+  header: {
+    paddingTop: 80,
+    paddingBottom: 30,
+    alignItems: 'center',
+    backgroundColor: COLORS.turquoise,
+  },
+  headerEmoji: { fontSize: 48, marginBottom: 8 },
+  headerTitle: {
+    fontSize: 26,
+    fontWeight: '800',
+    color: '#FFFFFF',
+    textShadowColor: 'rgba(0,0,0,0.15)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
+  },
+  headerSubtitle: { fontSize: 13, color: 'rgba(255,255,255,0.85)', marginTop: 4 },
+  formWrapper: { flex: 1, backgroundColor: COLORS.cream, borderTopLeftRadius: 24, borderTopRightRadius: 24, marginTop: -10 },
+  formCard: { padding: 24, paddingTop: 32, alignItems: 'center' },
+  formTitle: { fontSize: 20, fontWeight: '800', color: COLORS.textPrimary, marginBottom: 20 },
   input: {
-    backgroundColor: '#fff', borderRadius: 12, padding: 16,
-    fontSize: 16, marginBottom: 16, borderWidth: 1, borderColor: '#ddd',
+    width: '100%',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    padding: 14,
+    fontSize: 16,
+    marginBottom: 12,
+    borderWidth: 2,
+    borderColor: '#E0E0E0',
+    color: COLORS.textPrimary,
   },
-  button: {
-    backgroundColor: '#4CAF50', borderRadius: 12, padding: 16,
-    alignItems: 'center', marginBottom: 16,
-  },
-  buttonText: { color: '#fff', fontSize: 18, fontWeight: 'bold' },
-  link: { textAlign: 'center', color: '#4CAF50', fontSize: 14 },
+  link: { marginTop: 16, color: COLORS.turquoise, fontSize: 14, fontWeight: '600' },
 });
