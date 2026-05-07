@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withTiming, Easing } from 'react-native-reanimated';
 import { useTheme } from '../context/ThemeContext';
+import { COLORS } from '../constants/colors';
 
 interface TasksProgressProps {
   done: number;
@@ -25,14 +26,23 @@ export default function TasksProgress({ done, total }: TasksProgressProps) {
   const label = total === 0
     ? 'Pas de taches aujourd\'hui'
     : allDone
-      ? `Bravo ! ${done} / ${total} taches faites`
+      ? `Bravo ! ${done} / ${total} taches faites 🎉`
       : `${done} / ${total} taches faites`;
 
   return (
     <View style={styles.container}>
-      <Text style={[styles.label, allDone && { color: theme.primary }]}>{label}</Text>
+      <Text style={[styles.label, allDone && { color: theme.primary, fontWeight: '800' }]}>{label}</Text>
       <View style={styles.track}>
-        <Animated.View style={[styles.fill, { backgroundColor: allDone ? theme.primary : theme.accent }, fillStyle]} />
+        <Animated.View
+          style={[
+            styles.fill,
+            {
+              backgroundColor: allDone ? theme.primary : COLORS.turquoise,
+              shadowColor: allDone ? theme.primary : COLORS.turquoiseDark,
+            },
+            fillStyle,
+          ]}
+        />
       </View>
     </View>
   );
@@ -40,7 +50,21 @@ export default function TasksProgress({ done, total }: TasksProgressProps) {
 
 const styles = StyleSheet.create({
   container: { marginBottom: 12 },
-  label: { fontSize: 13, fontWeight: '600', color: '#666', marginBottom: 6 },
-  track: { height: 10, backgroundColor: '#e0e0e0', borderRadius: 10, overflow: 'hidden' },
-  fill: { height: '100%', borderRadius: 10 },
+  label: { fontSize: 13, fontWeight: '600', color: COLORS.textSecondary, marginBottom: 6 },
+  track: {
+    height: 12,
+    backgroundColor: '#E8E4DC',
+    borderRadius: 10,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: '#D8D4CC',
+  },
+  fill: {
+    height: '100%',
+    borderRadius: 10,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.6,
+    shadowRadius: 0,
+    elevation: 2,
+  },
 });
