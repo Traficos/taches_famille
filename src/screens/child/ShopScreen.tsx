@@ -8,6 +8,7 @@ import { updateChildPoints, getProfileById } from '../../api/profiles';
 import PointsBadge from '../../components/PointsBadge';
 import ShopItem from '../../components/ShopItem';
 import CelebrationOverlay from '../../components/CelebrationOverlay';
+import { COLORS } from '../../constants/colors';
 
 export default function ShopScreen() {
   const { currentProfile, setCurrentProfile } = useProfile();
@@ -86,7 +87,7 @@ function getAccessoryEmoji(key: string | null): string {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fafafa', padding: 16, paddingTop: 50 },
+  container: { flex: 1, backgroundColor: COLORS.cream, padding: 16, paddingTop: 50 },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 },
   title: { fontSize: 22, fontWeight: '700', color: '#333' },
   sectionTitle: { fontSize: 16, fontWeight: '600', color: '#666', marginTop: 16, marginBottom: 8 },

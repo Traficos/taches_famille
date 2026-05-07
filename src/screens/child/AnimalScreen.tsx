@@ -11,6 +11,7 @@ import AnimalDisplay from '../../components/AnimalDisplay';
 import PointsBadge from '../../components/PointsBadge';
 import { AnimalType, AnimalStage } from '../../constants/animals';
 import { useAnimalMood } from '../../hooks/useAnimalMood';
+import { COLORS } from '../../constants/colors';
 
 export default function AnimalScreen() {
   const { currentProfile, setCurrentProfile } = useProfile();
@@ -35,16 +36,12 @@ export default function AnimalScreen() {
 
   if (!currentProfile) return null;
 
+  const moodEmoji = mood === 'happy' ? '😊' : mood === 'sad' ? '😢' : '😴';
+
   return (
-    <View style={[styles.container, { backgroundColor: theme.background }]}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => {
-          setCurrentProfile(null);
-          navigation.navigate('ProfileSelect');
-        }}>
-          <Text style={styles.back}>← Retour</Text>
-        </TouchableOpacity>
-        <Text style={styles.name}>{currentProfile.name}</Text>
+    <View style={[styles.container, { backgroundColor: COLORS.cream }]}>
+      <View style={[styles.header, { backgroundColor: theme.primary }]}>
+        <Text style={styles.animalNameHeader}>{currentProfile.animal_name ?? currentProfile.name}</Text>
         <PointsBadge points={currentProfile.current_points} />
       </View>
       <AnimalDisplay
@@ -55,13 +52,33 @@ export default function AnimalScreen() {
         equippedAccessories={accessories}
         mood={mood}
       />
+      <View style={styles.moodBadge}>
+        <Text style={styles.moodEmoji}>{moodEmoji}</Text>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#bbdefb', padding: 20, paddingTop: 50 },
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
-  back: { fontSize: 16, color: '#1565c0', fontWeight: '600' },
-  name: { fontSize: 18, fontWeight: '700', color: '#1565c0' },
+  container: { flex: 1, padding: 0 },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+    padding: 16,
+    paddingTop: 50,
+    marginBottom: 20,
+  },
+  animalNameHeader: { fontSize: 20, fontWeight: '700', color: '#fff' },
+  moodBadge: {
+    alignSelf: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    marginTop: 12,
+  },
+  moodEmoji: { fontSize: 22 },
 });

@@ -13,6 +13,7 @@ import TasksProgress from '../../components/TasksProgress';
 import { AnimalAnimated } from '../../components/AnimalAnimated';
 import { AnimalSVG } from '../../components/AnimalSVG';
 import { AnimalType, AnimalStage } from '../../constants/animals';
+import { COLORS } from '../../constants/colors';
 
 interface TaskWithStatus extends Task {
   completedToday: boolean;
@@ -85,7 +86,7 @@ export default function TasksScreen() {
   ];
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.background }]}>
+    <View style={[styles.container, { backgroundColor: COLORS.cream }]}>
       {celebration !== null && (
         <CelebrationOverlay points={celebration} onDone={() => setCelebration(null)} />
       )}
@@ -143,7 +144,7 @@ export default function TasksScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fafafa', padding: 16, paddingTop: 50 },
+  container: { flex: 1, padding: 16, paddingTop: 50 },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 },
   headerLeft: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   title: { fontSize: 22, fontWeight: '700', color: '#333' },

@@ -4,6 +4,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { useProfile } from '../../context/ProfileContext';
 import { useTheme } from '../../context/ThemeContext';
 import { getVouchersForChild, Voucher } from '../../api/rewards';
+import { COLORS } from '../../constants/colors';
 
 export default function VouchersScreen() {
   const { currentProfile } = useProfile();
@@ -22,12 +23,12 @@ export default function VouchersScreen() {
   if (!currentProfile) return null;
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.background }]}>
+    <View style={[styles.container, { backgroundColor: COLORS.cream }]}>
       <Text style={styles.title}>🎟️ Mes bons</Text>
       <FlatList
         data={vouchers}
         keyExtractor={item => String(item.id)}
-        renderItem={({ item }) => <Ticket voucher={item} accent={theme.accent} primary={theme.primary} />}
+        renderItem={({ item }) => <Ticket voucher={item} accent={theme.accent} primary={theme.primary} tabBarActive={theme.tabBarActive} />}
         ListEmptyComponent={
           <Text style={styles.empty}>Pas encore de bons. Achete des recompenses dans la boutique !</Text>
         }
@@ -40,14 +41,15 @@ interface TicketProps {
   voucher: Voucher;
   accent: string;
   primary: string;
+  tabBarActive: string;
 }
 
-function Ticket({ voucher, accent, primary }: TicketProps) {
+function Ticket({ voucher, accent, primary, tabBarActive }: TicketProps) {
   const used = !!voucher.used;
-  const ribbonColor = used ? '#bdbdbd' : primary;
+  const ribbonColor = used ? '#bdbdbd' : tabBarActive;
 
   return (
-    <View style={[styles.ticket, used && styles.ticketUsed]}>
+    <View style={[styles.ticket, used && styles.ticketUsed, !used && styles.ticketActive]}>
       <View style={[styles.notch, styles.notchLeft]} />
       <View style={[styles.notch, styles.notchRight]} />
 
@@ -73,7 +75,7 @@ function Ticket({ voucher, accent, primary }: TicketProps) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fafafa', padding: 16, paddingTop: 50 },
+  container: { flex: 1, padding: 16, paddingTop: 50 },
   title: { fontSize: 22, fontWeight: '700', color: '#333', marginBottom: 16 },
   empty: { textAlign: 'center', color: '#999', marginTop: 40, fontSize: 16 },
 
@@ -91,6 +93,13 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   ticketUsed: { opacity: 0.55 },
+  ticketActive: {
+    shadowOffset: { width: 0, height: 4 },
+    shadowColor: '#E0E0E0',
+    shadowOpacity: 1,
+    shadowRadius: 0,
+    elevation: 3,
+  },
 
   stub: {
     width: 56,
@@ -131,7 +140,7 @@ const styles = StyleSheet.create({
     width: 16,
     height: 16,
     borderRadius: 8,
-    backgroundColor: '#fafafa',
+    backgroundColor: COLORS.cream,
     top: '50%',
     marginTop: -8,
     zIndex: 2,
