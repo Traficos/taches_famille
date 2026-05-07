@@ -7,13 +7,14 @@ import Animated, {
 } from 'react-native-reanimated';
 import { COLORS } from '../constants/colors';
 
-type Variant = 'primary' | 'secondary' | 'reward' | 'disabled';
+type Variant = 'primary' | 'secondary' | 'reward' | 'disabled' | 'danger';
 
 const VARIANT_STYLES: Record<Variant, { bg: string; shadow: string; text: string }> = {
   primary: { bg: COLORS.coral, shadow: COLORS.coralDark, text: '#FFFFFF' },
   secondary: { bg: COLORS.turquoise, shadow: COLORS.turquoiseDark, text: '#FFFFFF' },
   reward: { bg: COLORS.yellow, shadow: COLORS.yellowDark, text: '#5D4037' },
   disabled: { bg: COLORS.disabled, shadow: COLORS.disabledDark, text: COLORS.disabledText },
+  danger: { bg: '#D9534F', shadow: '#A94442', text: '#FFFFFF' },
 };
 
 interface GameButtonProps {

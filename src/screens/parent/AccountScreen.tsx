@@ -157,7 +157,7 @@ export default function AccountScreen() {
           <GameButton
             label="Supprimer mon compte"
             onPress={() => setDeleteOpen(true)}
-            variant="primary"
+            variant="danger"
           />
         </View>
       </ScrollView>
@@ -189,7 +189,7 @@ export default function AccountScreen() {
                 label={deleting ? 'Suppression...' : 'Confirmer la suppression'}
                 onPress={handleDeleteAccount}
                 disabled={deleting}
-                variant="primary"
+                variant="danger"
               />
             </View>
           </Pressable>
