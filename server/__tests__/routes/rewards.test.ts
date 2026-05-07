@@ -1,6 +1,6 @@
-import Fastify from 'fastify';
+import Fastify, { FastifyInstance } from 'fastify';
 import cors from '@fastify/cors';
-import { getDatabase, closeDatabase } from '../../src/db/database';
+import { initDatabase, closeDatabase } from '../../src/db/database';
 import { authRoutes } from '../../src/routes/auth';
 import { profileRoutes } from '../../src/routes/profiles';
 import { rewardRoutes } from '../../src/routes/rewards';
@@ -12,13 +12,15 @@ let childId: number;
 
 beforeEach(async () => {
   closeDatabase();
-  getDatabase(':memory:');
+  await initDatabase(':memory:');
   app = Fastify();
   await app.register(cors);
   await app.register(authRoutes, { prefix: '/auth' });
-  app.addHook('onRequest', authGuard);
-  await app.register(profileRoutes, { prefix: '/profiles' });
-  await app.register(rewardRoutes, { prefix: '/rewards' });
+  await app.register(async (instance: FastifyInstance) => {
+    instance.addHook('onRequest', authGuard);
+    await instance.register(profileRoutes, { prefix: '/profiles' });
+    await instance.register(rewardRoutes, { prefix: '/rewards' });
+  });
   await app.ready();
 
   const res = await app.inject({

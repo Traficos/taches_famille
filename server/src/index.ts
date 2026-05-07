@@ -1,6 +1,6 @@
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
-import { getDatabase } from './db/database';
+import { initDatabase } from './db/database';
 import { authRoutes } from './routes/auth';
 import { profileRoutes } from './routes/profiles';
 import { taskRoutes } from './routes/tasks';
@@ -30,8 +30,8 @@ async function start() {
     await instance.register(penaltyRoutes, { prefix: '/penalties' });
   });
 
-  // Initialiser la BDD
-  getDatabase();
+  // Initialiser la BDD (async pour sql.js)
+  await initDatabase();
 
   const port = parseInt(process.env.PORT ?? '3000', 10);
   const host = process.env.HOST ?? '0.0.0.0';

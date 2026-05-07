@@ -1,14 +1,14 @@
 process.env.NODE_ENV = 'test';
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
-import { getDatabase, closeDatabase } from '../../src/db/database';
+import { initDatabase, closeDatabase } from '../../src/db/database';
 import { authRoutes } from '../../src/routes/auth';
 
 let app: ReturnType<typeof Fastify>;
 
 beforeEach(async () => {
   closeDatabase();
-  getDatabase(':memory:');
+  await initDatabase(':memory:');
   app = Fastify();
   await app.register(cors);
   await app.register(authRoutes, { prefix: '/auth' });

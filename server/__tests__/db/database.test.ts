@@ -1,4 +1,9 @@
-import { getDatabase, closeDatabase } from '../../src/db/database';
+import { initDatabase, getDatabase, closeDatabase } from '../../src/db/database';
+
+beforeEach(async () => {
+  closeDatabase();
+  await initDatabase(':memory:');
+});
 
 afterEach(() => {
   closeDatabase();

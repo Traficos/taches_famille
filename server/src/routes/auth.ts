@@ -1,5 +1,5 @@
 import { FastifyInstance } from 'fastify';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import { getDatabase } from '../db/database';
 import { createToken } from '../middleware/auth';
 import { Family } from '../types';
