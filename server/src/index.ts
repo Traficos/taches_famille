@@ -6,6 +6,7 @@ import { profileRoutes } from './routes/profiles';
 import { taskRoutes } from './routes/tasks';
 import { rewardRoutes } from './routes/rewards';
 import { penaltyRoutes } from './routes/penalties';
+import { accountRoutes } from './routes/account';
 import { authGuard } from './middleware/auth';
 
 const app = Fastify({ logger: true });
@@ -28,6 +29,7 @@ async function start() {
     await instance.register(taskRoutes, { prefix: '/tasks' });
     await instance.register(rewardRoutes, { prefix: '/rewards' });
     await instance.register(penaltyRoutes, { prefix: '/penalties' });
+    await instance.register(accountRoutes, { prefix: '/account' });
   });
 
   // Initialiser la BDD (async pour sql.js)
