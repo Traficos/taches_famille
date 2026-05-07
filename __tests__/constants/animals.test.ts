@@ -1,8 +1,8 @@
 import { ANIMALS, STAGE_THRESHOLDS, getStageForPoints, AnimalType, AnimalStage } from '../../src/constants/animals';
 
 describe('animals', () => {
-  it('defines 5 animal species', () => {
-    expect(Object.keys(ANIMALS)).toHaveLength(5);
+  it('defines 10 animal species', () => {
+    expect(Object.keys(ANIMALS)).toHaveLength(10);
   });
 
   it('each animal has emoji for all 4 stages', () => {

@@ -10,12 +10,15 @@ import { getAccessoriesOwned } from '../../api/rewards';
 import AnimalDisplay from '../../components/AnimalDisplay';
 import PointsBadge from '../../components/PointsBadge';
 import { AnimalType, AnimalStage } from '../../constants/animals';
+import { useAnimalMood } from '../../hooks/useAnimalMood';
 
 export default function AnimalScreen() {
   const { currentProfile, setCurrentProfile } = useProfile();
   const theme = useTheme();
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const [accessories, setAccessories] = useState<string[]>([]);
+  const [moodKey, setMoodKey] = useState(0);
+  const mood = useAnimalMood(currentProfile?.id, moodKey);
 
   useFocusEffect(
     useCallback(() => {
@@ -25,6 +28,7 @@ export default function AnimalScreen() {
         setCurrentProfile(fresh);
         const owned = await getAccessoriesOwned(currentProfile.id);
         setAccessories(owned);
+        setMoodKey(k => k + 1);
       })();
     }, [currentProfile?.id])
   );
@@ -49,6 +53,7 @@ export default function AnimalScreen() {
         animalName={currentProfile.animal_name ?? ''}
         totalPoints={currentProfile.total_points}
         equippedAccessories={accessories}
+        mood={mood}
       />
     </View>
   );

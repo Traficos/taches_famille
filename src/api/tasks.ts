@@ -94,6 +94,11 @@ export async function getCompletionsForDate(profileId: number, date: string): Pr
   return apiFetch<TaskCompletion[]>(`/tasks/completions/${profileId}?date=${date}`);
 }
 
+export async function getLastCompletion(profileId: number): Promise<TaskCompletion | null> {
+  const list = await apiFetch<TaskCompletion[]>(`/tasks/completions/history/${profileId}`);
+  return list[0] ?? null;
+}
+
 export function isTaskScheduledToday(task: Task): boolean {
   if (task.recurrence === 'daily') return true;
   if (task.recurrence === 'once') return true;

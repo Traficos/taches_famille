@@ -9,6 +9,8 @@ import { getStageForPoints } from '../../constants/animals';
 import TaskCard from '../../components/TaskCard';
 import PointsBadge from '../../components/PointsBadge';
 import CelebrationOverlay from '../../components/CelebrationOverlay';
+import TasksProgress from '../../components/TasksProgress';
+import { AnimalAnimated } from '../../components/AnimalAnimated';
 import { AnimalSVG } from '../../components/AnimalSVG';
 import { AnimalType, AnimalStage } from '../../constants/animals';
 
@@ -74,6 +76,9 @@ export default function TasksScreen() {
 
   if (!currentProfile) return null;
 
+  const myDone = myTasks.filter(t => t.completedToday).length;
+  const myTotal = myTasks.length;
+
   const sections = [
     { title: 'Mes taches du jour', data: myTasks },
     ...(freeTasks.length > 0 ? [{ title: 'Taches disponibles', data: freeTasks }] : []),
@@ -97,6 +102,7 @@ export default function TasksScreen() {
         </View>
         <PointsBadge points={currentProfile.current_points} />
       </View>
+      <TasksProgress done={myDone} total={myTotal} />
       <SectionList
         sections={sections}
         keyExtractor={item => String(item.id)}
@@ -117,7 +123,20 @@ export default function TasksScreen() {
             onClaim={() => handleClaim(item)}
           />
         )}
-        ListEmptyComponent={<Text style={styles.empty}>Pas de taches pour aujourd'hui !</Text>}
+        ListEmptyComponent={
+          <View style={styles.emptyBox}>
+            {currentProfile.animal_type && (
+              <AnimalAnimated
+                animalType={currentProfile.animal_type as AnimalType}
+                stage={(currentProfile.animal_stage || 'egg') as AnimalStage}
+                mood="idle"
+                size={120}
+              />
+            )}
+            <Text style={styles.emptyTitle}>Pas de taches aujourd'hui</Text>
+            <Text style={styles.emptySub}>Reviens demain ou demande a tes parents.</Text>
+          </View>
+        }
       />
     </View>
   );
@@ -130,4 +149,7 @@ const styles = StyleSheet.create({
   title: { fontSize: 22, fontWeight: '700', color: '#333' },
   sectionTitle: { fontSize: 16, fontWeight: '600', color: '#666', marginTop: 16, marginBottom: 8 },
   empty: { textAlign: 'center', color: '#999', marginTop: 40, fontSize: 16 },
+  emptyBox: { alignItems: 'center', marginTop: 40, paddingHorizontal: 24 },
+  emptyTitle: { fontSize: 18, fontWeight: '700', color: '#444', marginTop: 12, textAlign: 'center' },
+  emptySub: { fontSize: 14, color: '#888', marginTop: 6, textAlign: 'center' },
 });
