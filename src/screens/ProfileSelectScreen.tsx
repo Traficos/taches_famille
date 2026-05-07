@@ -1,13 +1,14 @@
 import React, { useState, useCallback } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, FlatList, Modal } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Modal } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/RootNavigator';
 import { getAllProfiles, createParentProfile, Profile } from '../api/profiles';
 import { useProfile } from '../context/ProfileContext';
-import { ANIMALS, AnimalType, AnimalStage } from '../constants/animals';
+import ProfileCard from '../components/ProfileCard';
+import { StaggerItem } from '../components/StaggerList';
 import PinPad from '../components/PinPad';
-import { AnimalSVG } from '../components/AnimalSVG';
+import { COLORS } from '../constants/colors';
 
 type Nav = NativeStackNavigationProp<RootStackParamList, 'ProfileSelect'>;
 
@@ -36,36 +37,26 @@ export default function ProfileSelectScreen() {
     }
   }
 
-  function getEmoji(profile: Profile): string {
-    if (profile.type === 'parent') return '🔒';
-    const animal = ANIMALS[profile.animal_type as AnimalType];
-    if (!animal) return '🐾';
-    return animal.emojis[(profile.animal_stage as AnimalStage) ?? 'egg'];
-  }
-
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>🏠 Tache Famille</Text>
-      <Text style={styles.subtitle}>Qui es-tu ?</Text>
+      <Text style={styles.title}>Qui joue aujourd'hui ? 🎮</Text>
       <FlatList
         data={profiles}
         numColumns={3}
         contentContainerStyle={styles.grid}
+        columnWrapperStyle={styles.row}
         keyExtractor={p => String(p.id)}
-        renderItem={({ item }) => (
-          <TouchableOpacity style={styles.card} onPress={() => handleSelect(item)}>
-            {item.type === 'child' && item.animal_type ? (
-              <AnimalSVG
-                animalType={item.animal_type as AnimalType}
-                stage={(item.animal_stage || 'egg') as AnimalStage}
-                size={48}
-              />
-            ) : (
-              <Text style={styles.lockIcon}>🔒</Text>
-            )}
-            <Text style={styles.name}>{item.name}</Text>
-            {item.type === 'parent' && <Text style={styles.hint}>Code PIN</Text>}
-          </TouchableOpacity>
+        renderItem={({ item, index }) => (
+          <StaggerItem index={index}>
+            <ProfileCard
+              name={item.name}
+              type={item.type as 'child' | 'parent'}
+              animalType={item.animal_type ?? undefined}
+              animalStage={item.animal_stage ?? undefined}
+              points={item.type === 'child' ? item.current_points : undefined}
+              onPress={() => handleSelect(item)}
+            />
+          </StaggerItem>
         )}
       />
 
@@ -73,7 +64,7 @@ export default function ProfileSelectScreen() {
         <Modal visible transparent animationType="fade">
           <View style={styles.modalOverlay}>
             <View style={styles.modal}>
-              <Text style={styles.modalTitle}>Bienvenue !</Text>
+              <Text style={styles.modalTitle}>Bienvenue ! 🎉</Text>
               <Text style={styles.modalSubtitle}>Creez un code PIN parent pour commencer</Text>
               <PinPad onSubmit={async (pin) => {
                 await createParentProfile('Parent', pin);
@@ -90,29 +81,12 @@ export default function ProfileSelectScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#e8f5e9', paddingTop: 60, alignItems: 'center' },
-  title: { fontSize: 32, fontWeight: '700', color: '#2e7d32', marginBottom: 8 },
-  subtitle: { fontSize: 18, color: '#555', marginBottom: 30 },
+  container: { flex: 1, backgroundColor: COLORS.cream, paddingTop: 60, alignItems: 'center' },
+  title: { fontSize: 22, fontWeight: '800', color: COLORS.textPrimary, marginBottom: 30 },
   grid: { paddingHorizontal: 20 },
-  card: {
-    backgroundColor: '#fff',
-    borderRadius: 16,
-    padding: 20,
-    margin: 10,
-    width: 120,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 3,
-  },
-  emoji: { fontSize: 48, marginBottom: 8 },
-  lockIcon: { fontSize: 48, marginBottom: 8 },
-  name: { fontSize: 16, fontWeight: '600', color: '#333' },
-  hint: { fontSize: 11, color: '#999', marginTop: 4 },
+  row: { gap: 12, justifyContent: 'center', marginBottom: 12 },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'center', alignItems: 'center' },
   modal: { backgroundColor: '#fff', borderRadius: 24, padding: 30, width: '80%', alignItems: 'center' },
-  modalTitle: { fontSize: 24, fontWeight: '700', color: '#2e7d32', marginBottom: 8 },
-  modalSubtitle: { fontSize: 14, color: '#666', marginBottom: 20, textAlign: 'center' },
+  modalTitle: { fontSize: 24, fontWeight: '800', color: COLORS.turquoise, marginBottom: 8 },
+  modalSubtitle: { fontSize: 14, color: COLORS.textSecondary, marginBottom: 20, textAlign: 'center' },
 });
