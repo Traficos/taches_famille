@@ -7,10 +7,12 @@ import {
   ActivityIndicator,
   Alert,
   TextInput,
+  Modal,
+  Pressable,
 } from 'react-native';
 import { COLORS } from '../../constants/colors';
 import { useAuth } from '../../context/AuthContext';
-import { getMe, changePassword, AccountInfo } from '../../api/account';
+import { getMe, changePassword, deleteAccount, AccountInfo } from '../../api/account';
 import GameButton from '../../components/GameButton';
 
 function formatDate(iso: string): string {
@@ -30,6 +32,10 @@ export default function AccountScreen() {
   const [newPassword, setNewPassword] = useState('');
   const [pwError, setPwError] = useState<string | null>(null);
   const [pwSubmitting, setPwSubmitting] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deletePassword, setDeletePassword] = useState('');
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     getMe()
@@ -65,6 +71,29 @@ export default function AccountScreen() {
     }
   };
 
+  const handleDeleteAccount = async () => {
+    setDeleteError(null);
+    if (!deletePassword) {
+      setDeleteError('Mot de passe requis');
+      return;
+    }
+    setDeleting(true);
+    try {
+      await deleteAccount(deletePassword);
+      await logout();
+    } catch (err: any) {
+      setDeleteError(err.message ?? 'Suppression impossible');
+      setDeleting(false);
+    }
+  };
+
+  const closeDelete = () => {
+    if (deleting) return;
+    setDeleteOpen(false);
+    setDeletePassword('');
+    setDeleteError(null);
+  };
+
   if (loading) {
     return (
       <View style={styles.center}>
@@ -74,51 +103,99 @@ export default function AccountScreen() {
   }
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>Mon compte</Text>
-        <View style={styles.row}>
-          <Text style={styles.label}>📧 Email</Text>
-          <Text style={styles.value}>{info?.email}</Text>
+    <View style={{ flex: 1, backgroundColor: COLORS.parentBg }}>
+      <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Mon compte</Text>
+          <View style={styles.row}>
+            <Text style={styles.label}>📧 Email</Text>
+            <Text style={styles.value}>{info?.email}</Text>
+          </View>
+          <View style={styles.row}>
+            <Text style={styles.label}>📅 Membre depuis</Text>
+            <Text style={styles.value}>
+              {info?.createdAt ? formatDate(info.createdAt) : '—'}
+            </Text>
+          </View>
         </View>
-        <View style={styles.row}>
-          <Text style={styles.label}>📅 Membre depuis</Text>
-          <Text style={styles.value}>
-            {info?.createdAt ? formatDate(info.createdAt) : '—'}
+
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Mot de passe</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Mot de passe actuel"
+            secureTextEntry
+            value={currentPassword}
+            onChangeText={setCurrentPassword}
+            editable={!pwSubmitting}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Nouveau mot de passe (6+ caracteres)"
+            secureTextEntry
+            value={newPassword}
+            onChangeText={setNewPassword}
+            editable={!pwSubmitting}
+          />
+          {pwError && <Text style={styles.error}>{pwError}</Text>}
+          <GameButton
+            label={pwSubmitting ? 'Mise a jour...' : 'Mettre a jour'}
+            onPress={handleChangePassword}
+            disabled={pwSubmitting}
+          />
+        </View>
+
+        <View style={styles.section}>
+          <GameButton label="Se deconnecter" onPress={handleLogout} variant="secondary" />
+        </View>
+
+        <View style={styles.dangerCard}>
+          <Text style={styles.dangerTitle}>⚠ Zone dangereuse</Text>
+          <Text style={styles.dangerText}>
+            La suppression du compte est definitive. Toutes les donnees (enfants, taches, recompenses, historique) seront perdues.
           </Text>
+          <GameButton
+            label="Supprimer mon compte"
+            onPress={() => setDeleteOpen(true)}
+            variant="primary"
+          />
         </View>
-      </View>
+      </ScrollView>
 
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>Mot de passe</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Mot de passe actuel"
-          secureTextEntry
-          value={currentPassword}
-          onChangeText={setCurrentPassword}
-          editable={!pwSubmitting}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Nouveau mot de passe (6+ caracteres)"
-          secureTextEntry
-          value={newPassword}
-          onChangeText={setNewPassword}
-          editable={!pwSubmitting}
-        />
-        {pwError && <Text style={styles.error}>{pwError}</Text>}
-        <GameButton
-          label={pwSubmitting ? 'Mise a jour...' : 'Mettre a jour'}
-          onPress={handleChangePassword}
-          disabled={pwSubmitting}
-        />
-      </View>
-
-      <View style={styles.section}>
-        <GameButton label="Se deconnecter" onPress={handleLogout} variant="secondary" />
-      </View>
-    </ScrollView>
+      <Modal
+        visible={deleteOpen}
+        transparent
+        animationType="fade"
+        onRequestClose={closeDelete}
+      >
+        <Pressable style={styles.modalBackdrop} onPress={closeDelete}>
+          <Pressable style={styles.modalCard} onPress={() => {}}>
+            <Text style={styles.modalTitle}>⚠ Action irreversible</Text>
+            <Text style={styles.modalText}>
+              Confirme la suppression definitive du compte. Saisis ton mot de passe pour valider.
+            </Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Mot de passe"
+              secureTextEntry
+              value={deletePassword}
+              onChangeText={setDeletePassword}
+              editable={!deleting}
+            />
+            {deleteError && <Text style={styles.error}>{deleteError}</Text>}
+            <View style={styles.modalActions}>
+              <GameButton label="Annuler" onPress={closeDelete} disabled={deleting} />
+              <GameButton
+                label={deleting ? 'Suppression...' : 'Confirmer la suppression'}
+                onPress={handleDeleteAccount}
+                disabled={deleting}
+                variant="primary"
+              />
+            </View>
+          </Pressable>
+        </Pressable>
+      </Modal>
+    </View>
   );
 }
 
@@ -157,4 +234,31 @@ const styles = StyleSheet.create({
     fontSize: 13,
     marginBottom: 10,
   },
+  dangerCard: {
+    backgroundColor: '#FFF5F5',
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: '#FFD0D0',
+  },
+  dangerTitle: { fontSize: 14, fontWeight: '700', color: COLORS.coralDark, marginBottom: 6 },
+  dangerText: { fontSize: 13, color: COLORS.textSecondary, marginBottom: 12, lineHeight: 18 },
+  modalBackdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 16,
+  },
+  modalCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 20,
+    width: '100%',
+    maxWidth: 400,
+  },
+  modalTitle: { fontSize: 17, fontWeight: '700', color: COLORS.coralDark, marginBottom: 8 },
+  modalText: { fontSize: 14, color: COLORS.textPrimary, marginBottom: 14, lineHeight: 20 },
+  modalActions: { flexDirection: 'row', justifyContent: 'space-between', gap: 8, marginTop: 8 },
 });
