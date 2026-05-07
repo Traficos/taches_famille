@@ -6,10 +6,11 @@ import {
   ScrollView,
   ActivityIndicator,
   Alert,
+  TextInput,
 } from 'react-native';
 import { COLORS } from '../../constants/colors';
 import { useAuth } from '../../context/AuthContext';
-import { getMe, AccountInfo } from '../../api/account';
+import { getMe, changePassword, AccountInfo } from '../../api/account';
 import GameButton from '../../components/GameButton';
 
 function formatDate(iso: string): string {
@@ -25,6 +26,10 @@ export default function AccountScreen() {
   const { logout } = useAuth();
   const [info, setInfo] = useState<AccountInfo | null>(null);
   const [loading, setLoading] = useState(true);
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [pwError, setPwError] = useState<string | null>(null);
+  const [pwSubmitting, setPwSubmitting] = useState(false);
 
   useEffect(() => {
     getMe()
@@ -35,6 +40,29 @@ export default function AccountScreen() {
 
   const handleLogout = async () => {
     await logout();
+  };
+
+  const handleChangePassword = async () => {
+    setPwError(null);
+    if (!currentPassword || !newPassword) {
+      setPwError('Remplis les deux champs');
+      return;
+    }
+    if (newPassword.length < 6) {
+      setPwError('Le nouveau mot de passe doit faire au moins 6 caracteres');
+      return;
+    }
+    setPwSubmitting(true);
+    try {
+      await changePassword(currentPassword, newPassword);
+      setCurrentPassword('');
+      setNewPassword('');
+      Alert.alert('Mot de passe modifie');
+    } catch (err: any) {
+      setPwError(err.message ?? 'Erreur lors du changement');
+    } finally {
+      setPwSubmitting(false);
+    }
   };
 
   if (loading) {
@@ -59,6 +87,32 @@ export default function AccountScreen() {
             {info?.createdAt ? formatDate(info.createdAt) : '—'}
           </Text>
         </View>
+      </View>
+
+      <View style={styles.card}>
+        <Text style={styles.cardTitle}>Mot de passe</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Mot de passe actuel"
+          secureTextEntry
+          value={currentPassword}
+          onChangeText={setCurrentPassword}
+          editable={!pwSubmitting}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Nouveau mot de passe (6+ caracteres)"
+          secureTextEntry
+          value={newPassword}
+          onChangeText={setNewPassword}
+          editable={!pwSubmitting}
+        />
+        {pwError && <Text style={styles.error}>{pwError}</Text>}
+        <GameButton
+          label={pwSubmitting ? 'Mise a jour...' : 'Mettre a jour'}
+          onPress={handleChangePassword}
+          disabled={pwSubmitting}
+        />
       </View>
 
       <View style={styles.section}>
@@ -88,4 +142,19 @@ const styles = StyleSheet.create({
   label: { fontSize: 14, color: COLORS.textSecondary },
   value: { fontSize: 14, color: COLORS.textPrimary, fontWeight: '500' },
   section: { marginBottom: 16 },
+  input: {
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    fontSize: 15,
+    marginBottom: 10,
+    backgroundColor: '#FAFAFA',
+  },
+  error: {
+    color: COLORS.coral,
+    fontSize: 13,
+    marginBottom: 10,
+  },
 });
