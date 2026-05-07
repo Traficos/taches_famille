@@ -16,6 +16,29 @@ export async function accountRoutes(app: FastifyInstance) {
     }
     return { email: family.email, createdAt: family.created_at };
   });
-  // POST /account/change-password — implémenté en Task 3
+  app.post('/change-password', async (request, reply) => {
+    const familyId = (request as any).familyId;
+    const { currentPassword, newPassword } = request.body as {
+      currentPassword?: string;
+      newPassword?: string;
+    };
+    if (!currentPassword || !newPassword || newPassword.length < 6) {
+      return reply.status(400).send({
+        error: 'currentPassword requis et newPassword (6+ caracteres) requis',
+      });
+    }
+    const db = getDatabase();
+    const family = db.prepare('SELECT * FROM families WHERE id = ?').get(familyId) as Family | undefined;
+    if (!family) {
+      return reply.status(404).send({ error: 'Famille introuvable' });
+    }
+    const valid = await bcrypt.compare(currentPassword, family.password_hash);
+    if (!valid) {
+      return reply.status(401).send({ error: 'Mot de passe actuel incorrect' });
+    }
+    const newHash = await bcrypt.hash(newPassword, 10);
+    db.prepare('UPDATE families SET password_hash = ? WHERE id = ?').run(newHash, familyId);
+    return { ok: true };
+  });
   // DELETE /account — implémenté en Task 4
 }
