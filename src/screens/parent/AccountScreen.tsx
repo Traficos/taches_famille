@@ -7,7 +7,6 @@ import {
   ActivityIndicator,
   Alert,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 import { COLORS } from '../../constants/colors';
 import { useAuth } from '../../context/AuthContext';
 import { getMe, AccountInfo } from '../../api/account';
@@ -23,7 +22,6 @@ function formatDate(iso: string): string {
 }
 
 export default function AccountScreen() {
-  const navigation = useNavigation<any>();
   const { logout } = useAuth();
   const [info, setInfo] = useState<AccountInfo | null>(null);
   const [loading, setLoading] = useState(true);
