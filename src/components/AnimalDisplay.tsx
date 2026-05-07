@@ -4,6 +4,7 @@ import { ANIMALS, AnimalType, AnimalStage, getNextStageThreshold } from '../cons
 import { ACCESSORIES } from '../constants/accessories';
 import { AnimalAnimated } from './AnimalAnimated';
 import { useTheme } from '../context/ThemeContext';
+import { COLORS } from '../constants/colors';
 
 interface AnimalDisplayProps {
   animalType: AnimalType;
@@ -23,7 +24,7 @@ export default function AnimalDisplay({
   const stageLabel = animal?.stageLabels?.[animalStage];
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.background }]}>
+    <View style={[styles.container, { backgroundColor: COLORS.cream }]}>
       <View style={styles.animalArea}>
         <AnimalAnimated animalType={animalType} stage={animalStage} mood={mood} size={140} />
         {equippedAccessories.length > 0 && (
@@ -61,7 +62,7 @@ const styles = StyleSheet.create({
   accessoryEmoji: { fontSize: 24, marginLeft: 2 },
   name: { fontSize: 20, fontWeight: '700' },
   stage: { fontSize: 14, color: '#666', marginTop: 4 },
-  progressBar: { width: '100%', height: 10, backgroundColor: '#e0e0e0', borderRadius: 10, marginTop: 12 },
-  progressFill: { height: '100%', borderRadius: 10 },
-  progressText: { fontSize: 12, color: '#888', marginTop: 4 },
+  progressBar: { width: '100%', height: 12, backgroundColor: '#E8E4DC', borderRadius: 10, overflow: 'hidden', borderWidth: 1, borderColor: '#D8D4CC', marginTop: 12 },
+  progressFill: { height: '100%', borderRadius: 10, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.6, shadowRadius: 0, elevation: 2 },
+  progressText: { fontSize: 13, fontWeight: '800', color: COLORS.textPrimary, marginTop: 4 },
 });
