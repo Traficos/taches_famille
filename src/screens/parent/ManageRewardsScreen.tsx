@@ -29,7 +29,7 @@ export default function ManageRewardsScreen() {
 
   async function handleAdd() {
     if (!name.trim() || !cost.trim()) return;
-    await createReward({ name: name.trim(), cost: parseInt(cost, 10), type: 'real' });
+    await createReward({ name: name.trim(), cost: parseInt(cost, 10) });
     setName('');
     setCost('500');
     setShowModal(false);

@@ -5,8 +5,8 @@ export interface Reward {
   family_id: number;
   name: string;
   cost: number;
-  type: 'real' | 'accessory';
-  accessory_key: string | null;
+  type: 'real';
+  accessory_key: null;
 }
 
 export interface Voucher {
@@ -27,11 +27,7 @@ export async function getRealRewards(): Promise<Reward[]> {
   return apiFetch<Reward[]>('/rewards/real');
 }
 
-export async function getAccessoryRewards(): Promise<Reward[]> {
-  return apiFetch<Reward[]>('/rewards/accessories');
-}
-
-export async function createReward(input: { name: string; cost: number; type: 'real' | 'accessory'; accessoryKey?: string }): Promise<number> {
+export async function createReward(input: { name: string; cost: number }): Promise<number> {
   const res = await apiFetch<{ id: number }>('/rewards', {
     method: 'POST',
     body: JSON.stringify(input),
@@ -53,10 +49,6 @@ export async function purchaseReward(rewardId: number, profileId: number): Promi
 
 export async function getVouchersForChild(childId: number): Promise<Voucher[]> {
   return apiFetch<Voucher[]>(`/rewards/vouchers/${childId}`);
-}
-
-export async function getAccessoriesOwned(childId: number): Promise<string[]> {
-  return apiFetch<string[]>(`/rewards/accessories-owned/${childId}`);
 }
 
 export async function markVoucherUsed(voucherId: number): Promise<void> {
