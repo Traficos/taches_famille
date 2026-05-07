@@ -4,6 +4,8 @@ import { useFocusEffect } from '@react-navigation/native';
 import { getAllTasks, createTask, updateTask, deleteTask, Task } from '../../api/tasks';
 import { getAllProfiles, Profile } from '../../api/profiles';
 import { TASK_ICONS } from '../../constants/taskIcons';
+import GlowButton from '../../components/GlowButton';
+import { COLORS } from '../../constants/colors';
 
 const DAY_LABELS = [
   { day: 1, label: 'L' },
@@ -101,9 +103,7 @@ export default function ManageTasksScreen() {
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>📋 Taches</Text>
-        <TouchableOpacity style={styles.addButton} onPress={openAdd}>
-          <Text style={styles.addButtonText}>+ Nouvelle tache</Text>
-        </TouchableOpacity>
+        <GlowButton label="+ Nouvelle tache" onPress={openAdd} />
       </View>
 
       <FlatList
@@ -230,12 +230,8 @@ export default function ManageTasksScreen() {
               )}
 
               <View style={styles.modalButtons}>
-                <TouchableOpacity style={styles.cancelButton} onPress={() => { setShowModal(false); setEditingTask(null); }}>
-                  <Text style={styles.cancelText}>Annuler</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.confirmButton} onPress={handleSave}>
-                  <Text style={styles.confirmText}>{editingTask ? 'Enregistrer' : 'Creer'}</Text>
-                </TouchableOpacity>
+                <GlowButton label="Annuler" variant="neutral" onPress={() => { setShowModal(false); setEditingTask(null); }} />
+                <GlowButton label={editingTask ? 'Enregistrer' : 'Creer'} onPress={handleSave} />
               </View>
             </View>
           </ScrollView>
@@ -246,15 +242,16 @@ export default function ManageTasksScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fafafa', padding: 16, paddingTop: 50 },
+  container: { flex: 1, backgroundColor: COLORS.parentBg, padding: 16, paddingTop: 50 },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 },
   title: { fontSize: 22, fontWeight: '700', color: '#333' },
   addButton: { backgroundColor: '#1565c0', borderRadius: 8, paddingVertical: 8, paddingHorizontal: 16 },
   addButtonText: { color: '#fff', fontWeight: '600' },
   card: {
-    backgroundColor: '#fff', borderRadius: 12, padding: 16, marginBottom: 10,
+    backgroundColor: '#fff', borderRadius: 18, padding: 16, marginBottom: 10,
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
-    shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.06, shadowRadius: 4, elevation: 2,
+    borderWidth: 1, borderColor: COLORS.border,
+    shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.08, shadowRadius: 12, elevation: 2,
   },
   taskName: { fontSize: 16, fontWeight: '600', color: '#333' },
   taskInfo: { fontSize: 12, color: '#888', marginTop: 4 },
@@ -276,7 +273,7 @@ const styles = StyleSheet.create({
   iconEmoji: { fontSize: 24 },
   row: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   chip: { paddingVertical: 8, paddingHorizontal: 16, borderRadius: 20, backgroundColor: '#eee' },
-  chipActive: { backgroundColor: '#1565c0' },
+  chipActive: { backgroundColor: COLORS.turquoise },
   chipText: { fontSize: 13, color: '#666' },
   chipTextActive: { color: '#fff', fontWeight: '600' },
   dayChip: { width: 40, height: 40, borderRadius: 20, backgroundColor: '#eee', justifyContent: 'center', alignItems: 'center' },

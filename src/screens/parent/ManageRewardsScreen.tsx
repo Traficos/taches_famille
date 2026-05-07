@@ -3,6 +3,8 @@ import { View, Text, StyleSheet, FlatList, TouchableOpacity, TextInput, Modal } 
 import { useFocusEffect } from '@react-navigation/native';
 import { getRealRewards, createReward, deleteReward, Reward, getVouchersForChild, markVoucherUsed, Voucher } from '../../api/rewards';
 import { getAllProfiles, Profile } from '../../api/profiles';
+import GlowButton from '../../components/GlowButton';
+import { COLORS } from '../../constants/colors';
 
 export default function ManageRewardsScreen() {
   const [rewards, setRewards] = useState<Reward[]>([]);
@@ -50,9 +52,7 @@ export default function ManageRewardsScreen() {
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>🎁 Recompenses</Text>
-        <TouchableOpacity style={styles.addButton} onPress={() => setShowModal(true)}>
-          <Text style={styles.addButtonText}>+ Nouvelle</Text>
-        </TouchableOpacity>
+        <GlowButton label="+ Nouvelle" onPress={() => setShowModal(true)} />
       </View>
 
       <Text style={styles.sectionTitle}>Recompenses disponibles</Text>
@@ -86,9 +86,7 @@ export default function ManageRewardsScreen() {
                   <Text style={styles.rewardName}>{item.reward_name}</Text>
                   <Text style={styles.rewardCost}>Par {item.childName} • {new Date(item.purchased_at).toLocaleDateString('fr-FR')}</Text>
                 </View>
-                <TouchableOpacity style={styles.validateButton} onPress={() => handleMarkUsed(item.id)}>
-                  <Text style={styles.validateText}>Valider</Text>
-                </TouchableOpacity>
+                <GlowButton label="Valider" onPress={() => handleMarkUsed(item.id)} style={{ paddingVertical: 8, paddingHorizontal: 16 }} />
               </View>
             )}
           />
@@ -104,12 +102,8 @@ export default function ManageRewardsScreen() {
             <Text style={styles.label}>Cout en points</Text>
             <TextInput style={styles.input} value={cost} onChangeText={setCost} keyboardType="numeric" />
             <View style={styles.modalButtons}>
-              <TouchableOpacity style={styles.cancelButton} onPress={() => setShowModal(false)}>
-                <Text style={styles.cancelText}>Annuler</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.confirmButton} onPress={handleAdd}>
-                <Text style={styles.confirmText}>Creer</Text>
-              </TouchableOpacity>
+              <GlowButton label="Annuler" variant="neutral" onPress={() => setShowModal(false)} />
+              <GlowButton label="Creer" onPress={handleAdd} />
             </View>
           </View>
         </View>
@@ -119,16 +113,17 @@ export default function ManageRewardsScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fafafa', padding: 16, paddingTop: 50 },
+  container: { flex: 1, backgroundColor: COLORS.parentBg, padding: 16, paddingTop: 50 },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 },
   title: { fontSize: 22, fontWeight: '700', color: '#333' },
   sectionTitle: { fontSize: 16, fontWeight: '600', color: '#666', marginBottom: 8 },
   addButton: { backgroundColor: '#1565c0', borderRadius: 8, paddingVertical: 8, paddingHorizontal: 16 },
   addButtonText: { color: '#fff', fontWeight: '600' },
   card: {
-    backgroundColor: '#fff', borderRadius: 12, padding: 16, marginBottom: 10,
+    backgroundColor: '#fff', borderRadius: 18, padding: 16, marginBottom: 10,
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
-    shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.06, shadowRadius: 4, elevation: 2,
+    borderWidth: 1, borderColor: COLORS.border,
+    shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.08, shadowRadius: 12, elevation: 2,
   },
   rewardName: { fontSize: 16, fontWeight: '600', color: '#333' },
   rewardCost: { fontSize: 12, color: '#888', marginTop: 4 },

@@ -5,6 +5,8 @@ import { getAllProfiles, createChildProfile, updateChildProfile, deleteProfile, 
 import { createPenalty, getPenaltyCountForProfile } from '../../api/penalties';
 import { getAnimalsByAgeGroup, AgeGroup, ANIMALS, AnimalType, AnimalStage } from '../../constants/animals';
 import { AnimalSVG } from '../../components/AnimalSVG';
+import GlowButton from '../../components/GlowButton';
+import { COLORS } from '../../constants/colors';
 
 export default function ManageChildrenScreen() {
   const [profiles, setProfiles] = useState<Profile[]>([]);
@@ -113,9 +115,7 @@ export default function ManageChildrenScreen() {
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>👧 Enfants</Text>
-        <TouchableOpacity style={styles.addButton} onPress={openAdd}>
-          <Text style={styles.addButtonText}>+ Ajouter</Text>
-        </TouchableOpacity>
+        <GlowButton label="+ Ajouter" onPress={openAdd} />
       </View>
 
       <FlatList
@@ -189,12 +189,8 @@ export default function ManageChildrenScreen() {
             <TextInput style={styles.input} value={newAnimalName} onChangeText={setNewAnimalName} placeholder="Nom de l'animal" />
 
             <View style={styles.modalButtons}>
-              <TouchableOpacity style={styles.cancelButton} onPress={() => { setShowModal(false); setEditingChild(null); }}>
-                <Text style={styles.cancelText}>Annuler</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.confirmButton} onPress={handleSave}>
-                <Text style={styles.confirmText}>{editingChild ? 'Enregistrer' : 'Ajouter'}</Text>
-              </TouchableOpacity>
+              <GlowButton label="Annuler" variant="neutral" onPress={() => { setShowModal(false); setEditingChild(null); }} />
+              <GlowButton label={editingChild ? 'Enregistrer' : 'Ajouter'} onPress={handleSave} />
             </View>
           </View>
         </View>
@@ -224,12 +220,8 @@ export default function ManageChildrenScreen() {
             />
 
             <View style={styles.modalButtons}>
-              <TouchableOpacity style={styles.cancelButton} onPress={() => { setShowPenaltyModal(false); setPenaltyChild(null); }}>
-                <Text style={styles.cancelText}>Annuler</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.penaltyConfirmButton} onPress={handlePenalty}>
-                <Text style={styles.confirmText}>Retirer les points</Text>
-              </TouchableOpacity>
+              <GlowButton label="Annuler" variant="neutral" onPress={() => { setShowPenaltyModal(false); setPenaltyChild(null); }} />
+              <GlowButton label="Retirer les points" variant="danger" onPress={handlePenalty} />
             </View>
           </View>
         </View>
@@ -239,15 +231,16 @@ export default function ManageChildrenScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fafafa', padding: 16, paddingTop: 50 },
+  container: { flex: 1, backgroundColor: COLORS.parentBg, padding: 16, paddingTop: 50 },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 },
   title: { fontSize: 22, fontWeight: '700', color: '#333' },
   addButton: { backgroundColor: '#1565c0', borderRadius: 8, paddingVertical: 8, paddingHorizontal: 16 },
   addButtonText: { color: '#fff', fontWeight: '600' },
   card: {
-    backgroundColor: '#fff', borderRadius: 12, padding: 16, marginBottom: 10,
+    backgroundColor: '#fff', borderRadius: 18, padding: 16, marginBottom: 10,
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
-    shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.06, shadowRadius: 4, elevation: 2,
+    borderWidth: 1, borderColor: COLORS.border,
+    shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.08, shadowRadius: 12, elevation: 2,
   },
   cardLeft: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   childName: { fontSize: 16, fontWeight: '600', color: '#333' },
@@ -264,7 +257,7 @@ const styles = StyleSheet.create({
   input: { borderWidth: 1, borderColor: '#ddd', borderRadius: 8, padding: 12, fontSize: 16 },
   animalPicker: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   animalOption: { alignItems: 'center', padding: 8, borderRadius: 12, borderWidth: 2, borderColor: 'transparent' },
-  animalSelected: { borderColor: '#4CAF50', backgroundColor: '#e8f5e9' },
+  animalSelected: { borderColor: '#4ECDC4', backgroundColor: '#4ECDC415' },
   animalEmoji: { fontSize: 32 },
   animalLabel: { fontSize: 11, color: '#666', marginTop: 2 },
   modalButtons: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 20 },
@@ -274,7 +267,7 @@ const styles = StyleSheet.create({
   confirmText: { color: '#fff', fontWeight: '600' },
   ageGroupToggle: { flexDirection: 'row', marginBottom: 12, gap: 8 },
   ageGroupBtn: { flex: 1, paddingVertical: 8, paddingHorizontal: 12, borderRadius: 8, backgroundColor: '#f0f0f0', alignItems: 'center' },
-  ageGroupActive: { backgroundColor: '#4CAF50' },
+  ageGroupActive: { backgroundColor: COLORS.turquoise },
   ageGroupText: { fontSize: 13, color: '#666' },
   ageGroupTextActive: { color: 'white', fontWeight: '600' },
   penaltyBtn: { padding: 8 },

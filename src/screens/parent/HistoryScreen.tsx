@@ -6,6 +6,7 @@ import { cancelCompletion } from '../../api/tasks';
 import { TASK_ICONS } from '../../constants/taskIcons';
 import { getPenaltiesForProfile, Penalty } from '../../api/penalties';
 import { apiFetch } from '../../api/client';
+import { COLORS } from '../../constants/colors';
 
 interface TaskCompletionRaw {
   id: number;
@@ -174,17 +175,18 @@ export default function HistoryScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fafafa', padding: 16, paddingTop: 50 },
+  container: { flex: 1, backgroundColor: COLORS.parentBg, padding: 16, paddingTop: 50 },
   title: { fontSize: 22, fontWeight: '700', color: '#333', marginBottom: 16 },
   filters: { flexDirection: 'row', gap: 8, marginBottom: 16 },
   chip: { paddingVertical: 8, paddingHorizontal: 16, borderRadius: 20, backgroundColor: '#eee' },
-  chipActive: { backgroundColor: '#1565c0' },
+  chipActive: { backgroundColor: COLORS.turquoise },
   chipText: { fontSize: 13, color: '#666' },
   chipTextActive: { color: '#fff', fontWeight: '600' },
   entry: {
-    backgroundColor: '#fff', borderRadius: 12, padding: 14, marginBottom: 8,
+    backgroundColor: '#fff', borderRadius: 18, padding: 14, marginBottom: 8,
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
-    shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.06, shadowRadius: 4, elevation: 2,
+    borderWidth: 1, borderColor: COLORS.border,
+    shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.08, shadowRadius: 12, elevation: 2,
   },
   entryPenalty: { borderLeftWidth: 3, borderLeftColor: '#e53935' },
   entryLeft: { flex: 1 },
@@ -193,7 +195,7 @@ const styles = StyleSheet.create({
   entryInfo: { fontSize: 12, color: '#888', marginTop: 4 },
   entryPoints: { color: '#f9a825', fontWeight: '700' },
   entryPointsPenalty: { color: '#e53935', fontWeight: '700' },
-  cancelBtn: { backgroundColor: '#ffebee', paddingVertical: 4, paddingHorizontal: 10, borderRadius: 6 },
-  cancelBtnText: { fontSize: 11, color: '#e53935', fontWeight: '600' },
+  cancelBtn: { backgroundColor: '#FF6B6B15', paddingVertical: 4, paddingHorizontal: 10, borderRadius: 6 },
+  cancelBtnText: { fontSize: 11, color: COLORS.coral, fontWeight: '600' },
   empty: { textAlign: 'center', color: '#999', marginTop: 40, fontSize: 16 },
 });
