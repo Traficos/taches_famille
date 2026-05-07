@@ -6,7 +6,6 @@ import { RootStackParamList } from '../../navigation/RootNavigator';
 import { useProfile } from '../../context/ProfileContext';
 import { useTheme } from '../../context/ThemeContext';
 import { getProfileById } from '../../api/profiles';
-import { getAccessoriesOwned } from '../../api/rewards';
 import AnimalDisplay from '../../components/AnimalDisplay';
 import PointsBadge from '../../components/PointsBadge';
 import { AnimalType, AnimalStage } from '../../constants/animals';
@@ -17,7 +16,6 @@ export default function AnimalScreen() {
   const { currentProfile, setCurrentProfile } = useProfile();
   const theme = useTheme();
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-  const [accessories, setAccessories] = useState<string[]>([]);
   const [moodKey, setMoodKey] = useState(0);
   const mood = useAnimalMood(currentProfile?.id, moodKey);
 
@@ -27,8 +25,6 @@ export default function AnimalScreen() {
       (async () => {
         const fresh = await getProfileById(currentProfile.id);
         setCurrentProfile(fresh);
-        const owned = await getAccessoriesOwned(currentProfile.id);
-        setAccessories(owned);
         setMoodKey(k => k + 1);
       })();
     }, [currentProfile?.id])
@@ -49,7 +45,6 @@ export default function AnimalScreen() {
         animalStage={currentProfile.animal_stage as AnimalStage}
         animalName={currentProfile.animal_name ?? ''}
         totalPoints={currentProfile.total_points}
-        equippedAccessories={accessories}
         mood={mood}
       />
       <View style={styles.moodBadge}>

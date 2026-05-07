@@ -1,7 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { ANIMALS, AnimalType, AnimalStage, getNextStageThreshold } from '../constants/animals';
-import { ACCESSORIES } from '../constants/accessories';
 import { AnimalAnimated } from './AnimalAnimated';
 import { useTheme } from '../context/ThemeContext';
 import { COLORS } from '../constants/colors';
@@ -11,12 +10,11 @@ interface AnimalDisplayProps {
   animalStage: AnimalStage;
   animalName: string;
   totalPoints: number;
-  equippedAccessories: string[];
   mood?: 'idle' | 'happy' | 'sad' | 'evolving';
 }
 
 export default function AnimalDisplay({
-  animalType, animalStage, animalName, totalPoints, equippedAccessories, mood = 'idle',
+  animalType, animalStage, animalName, totalPoints, mood = 'idle',
 }: AnimalDisplayProps) {
   const theme = useTheme();
   const animal = ANIMALS[animalType];
@@ -27,16 +25,6 @@ export default function AnimalDisplay({
     <View style={[styles.container, { backgroundColor: COLORS.cream }]}>
       <View style={styles.animalArea}>
         <AnimalAnimated animalType={animalType} stage={animalStage} mood={mood} size={140} />
-        {equippedAccessories.length > 0 && (
-          <View style={styles.accessories}>
-            {equippedAccessories.map(key => {
-              const acc = ACCESSORIES.find(a => a.key === key);
-              return (
-                <Text key={key} style={styles.accessoryEmoji}>{acc?.emoji ?? '✨'}</Text>
-              );
-            })}
-          </View>
-        )}
       </View>
       <Text style={[styles.name, { color: theme.primary }]}>{animalName}</Text>
       {stageLabel && <Text style={styles.stage}>{stageLabel}</Text>}
@@ -58,8 +46,6 @@ export default function AnimalDisplay({
 const styles = StyleSheet.create({
   container: { borderRadius: 24, padding: 30, alignItems: 'center' },
   animalArea: { position: 'relative', marginBottom: 12 },
-  accessories: { flexDirection: 'row', position: 'absolute', top: -10, right: -20 },
-  accessoryEmoji: { fontSize: 24, marginLeft: 2 },
   name: { fontSize: 20, fontWeight: '700' },
   stage: { fontSize: 14, color: '#666', marginTop: 4 },
   progressBar: { width: '100%', height: 12, backgroundColor: '#E8E4DC', borderRadius: 10, overflow: 'hidden', borderWidth: 1, borderColor: '#D8D4CC', marginTop: 12 },
