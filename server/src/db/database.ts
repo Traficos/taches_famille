@@ -3,10 +3,19 @@ import path from 'path';
 import fs from 'fs';
 import { ALL_TABLES } from './schema';
 
+function txControl(sql: string): 'begin' | 'commit' | 'rollback' | null {
+  const s = sql.trim().toUpperCase();
+  if (s.startsWith('BEGIN')) return 'begin';
+  if (s.startsWith('COMMIT') || s === 'END' || s.startsWith('END ')) return 'commit';
+  if (s.startsWith('ROLLBACK')) return 'rollback';
+  return null;
+}
+
 // Wrapper to provide a better-sqlite3-compatible API over sql.js
 class DatabaseWrapper {
   private db: SqlJsDatabase;
   private dbPath: string | null;
+  private inTransaction = false;
 
   constructor(db: SqlJsDatabase, dbPath: string | null) {
     this.db = db;
@@ -14,8 +23,19 @@ class DatabaseWrapper {
   }
 
   exec(sql: string): void {
-    this.db.run(sql);
-    this.save();
+    const ctrl = txControl(sql);
+    if (ctrl === 'begin') {
+      this.db.run(sql);
+      this.inTransaction = true;
+      // do NOT save — we're starting a transaction
+    } else if (ctrl === 'commit' || ctrl === 'rollback') {
+      this.db.run(sql);
+      this.inTransaction = false;
+      this.save();
+    } else {
+      this.db.run(sql);
+      if (!this.inTransaction) this.save();
+    }
   }
 
   pragma(pragma: string): void {
@@ -55,7 +75,7 @@ class DatabaseWrapper {
         const changesResult = db.exec('SELECT changes() as c');
         const lastInsertRowid = lastId[0]?.values[0]?.[0] as number ?? 0;
         const changes = changesResult[0]?.values[0]?.[0] as number ?? 0;
-        wrapper.save();
+        if (!wrapper.inTransaction) wrapper.save();
         return { lastInsertRowid, changes };
       },
     };
