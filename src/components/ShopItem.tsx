@@ -1,5 +1,8 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
+import GameCard from './GameCard';
+import GameButton from './GameButton';
+import { COLORS } from '../constants/colors';
 
 interface ShopItemProps {
   name: string;
@@ -12,40 +15,55 @@ interface ShopItemProps {
 
 export default function ShopItem({ name, emoji, cost, canAfford, owned, onBuy }: ShopItemProps) {
   return (
-    <View style={[styles.card, !canAfford && !owned && styles.cardDisabled]}>
-      <View style={styles.left}>
-        <Text style={styles.emoji}>{emoji}</Text>
-        <Text style={[styles.name, !canAfford && !owned && styles.nameDisabled]}>{name}</Text>
+    <GameCard style={!canAfford && !owned ? styles.cardDisabled : undefined}>
+      <View style={styles.row}>
+        <View style={styles.iconBox}>
+          <Text style={styles.emoji}>{emoji}</Text>
+        </View>
+        <View style={styles.info}>
+          <Text style={styles.name}>{name}</Text>
+          <View style={styles.priceBadge}>
+            <Text style={styles.priceText}>⭐ {cost} pts</Text>
+          </View>
+        </View>
+        {owned ? (
+          <Text style={styles.owned}>Possede ✓</Text>
+        ) : (
+          <GameButton
+            label="Acheter"
+            variant="secondary"
+            size="small"
+            onPress={onBuy}
+            disabled={!canAfford}
+          />
+        )}
       </View>
-      {owned ? (
-        <Text style={styles.owned}>Achete ✓</Text>
-      ) : (
-        <TouchableOpacity
-          style={[styles.button, !canAfford && styles.buttonDisabled]}
-          onPress={onBuy}
-          disabled={!canAfford}
-        >
-          <Text style={[styles.buttonText, !canAfford && styles.buttonTextDisabled]}>{cost} pts</Text>
-        </TouchableOpacity>
-      )}
-    </View>
+    </GameCard>
   );
 }
 
 const styles = StyleSheet.create({
-  card: {
-    backgroundColor: '#fff', borderRadius: 12, padding: 14, marginBottom: 8,
-    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
-    shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.06, shadowRadius: 4, elevation: 2,
+  row: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  iconBox: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    backgroundColor: '#95E1D333',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
+  emoji: { fontSize: 22 },
+  info: { flex: 1 },
+  name: { fontSize: 14, fontWeight: '700', color: COLORS.textPrimary },
+  priceBadge: {
+    alignSelf: 'flex-start',
+    backgroundColor: '#FFE66D44',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 8,
+    marginTop: 4,
+  },
+  priceText: { fontSize: 11, fontWeight: '700', color: '#8a6d00' },
+  owned: { color: COLORS.turquoise, fontWeight: '700', fontSize: 13 },
   cardDisabled: { opacity: 0.5 },
-  left: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  emoji: { fontSize: 24 },
-  name: { fontSize: 16, fontWeight: '600', color: '#333' },
-  nameDisabled: { color: '#999' },
-  button: { backgroundColor: '#ab47bc', borderRadius: 8, paddingVertical: 6, paddingHorizontal: 14 },
-  buttonDisabled: { backgroundColor: '#e0e0e0' },
-  buttonText: { color: '#fff', fontSize: 13, fontWeight: '600' },
-  buttonTextDisabled: { color: '#999' },
-  owned: { color: '#66bb6a', fontWeight: '600', fontSize: 13 },
 });
