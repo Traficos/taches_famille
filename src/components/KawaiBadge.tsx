@@ -28,7 +28,7 @@ export function KawaiBadge({ emoji, iconKey, category, size = 56 }: KawaiBadgePr
 }
 
 const styles = StyleSheet.create({
-  container: { justifyContent: 'center', alignItems: 'center', borderWidth: 2, shadowOffset: { width: 0, height: 3 }, shadowOpacity: 1, shadowRadius: 12, elevation: 4, position: 'relative', overflow: 'visible' },
+  container: { justifyContent: 'center', alignItems: 'center', borderWidth: 2, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 1, shadowRadius: 0, elevation: 4, position: 'relative', overflow: 'visible' },
   gradientOverlay: { position: 'absolute', top: 0, left: 0, right: 0, bottom: '50%' as any, opacity: 0.5 },
   emoji: { textAlign: 'center' },
   sparkle: { position: 'absolute', top: -4, right: -4, justifyContent: 'center', alignItems: 'center' },
