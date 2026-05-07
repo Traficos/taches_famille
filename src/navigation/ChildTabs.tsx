@@ -8,8 +8,16 @@ import VouchersScreen from '../screens/child/VouchersScreen';
 import { Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import { useProfile } from '../context/ProfileContext';
+import TabBarIcon from '../components/TabBarIcon';
 
 const Tab = createBottomTabNavigator();
+
+const TABS = [
+  { name: 'Animal', label: 'Animal', emoji: '🐾', component: AnimalScreen },
+  { name: 'Tasks', label: 'Taches', emoji: '📋', component: TasksScreen },
+  { name: 'Shop', label: 'Boutique', emoji: '🛍️', component: ShopScreen },
+  { name: 'Vouchers', label: 'Bons', emoji: '🎟️', component: VouchersScreen },
+];
 
 export default function ChildTabs() {
   const theme = useTheme();
@@ -24,10 +32,19 @@ export default function ChildTabs() {
   return (
     <Tab.Navigator
       screenOptions={{
-        tabBarActiveTintColor: theme.tabBarActive,
-        tabBarInactiveTintColor: '#999',
-        tabBarStyle: { height: 60, paddingBottom: 8 },
-        tabBarLabelStyle: { fontSize: 12 },
+        tabBarShowLabel: false,
+        tabBarStyle: {
+          height: 70,
+          paddingBottom: 8,
+          paddingTop: 4,
+          backgroundColor: '#FFFFFF',
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: -2 },
+          shadowOpacity: 0.05,
+          shadowRadius: 8,
+          elevation: 8,
+          borderTopWidth: 0,
+        },
         headerShown: true,
         headerTitle: '',
         headerStyle: { backgroundColor: theme.background },
@@ -39,26 +56,24 @@ export default function ChildTabs() {
         ),
       }}
     >
-      <Tab.Screen
-        name="Animal"
-        component={AnimalScreen}
-        options={{ tabBarLabel: 'Mon animal', tabBarIcon: ({ color }) => <Text style={{ fontSize: 24, color }}>🐾</Text> }}
-      />
-      <Tab.Screen
-        name="Tasks"
-        component={TasksScreen}
-        options={{ tabBarLabel: 'Taches', tabBarIcon: ({ color }) => <Text style={{ fontSize: 24, color }}>📋</Text> }}
-      />
-      <Tab.Screen
-        name="Shop"
-        component={ShopScreen}
-        options={{ tabBarLabel: 'Boutique', tabBarIcon: ({ color }) => <Text style={{ fontSize: 24, color }}>🛍️</Text> }}
-      />
-      <Tab.Screen
-        name="Vouchers"
-        component={VouchersScreen}
-        options={{ tabBarLabel: 'Mes bons', tabBarIcon: ({ color }) => <Text style={{ fontSize: 24, color }}>🎟️</Text> }}
-      />
+      {TABS.map(tab => (
+        <Tab.Screen
+          key={tab.name}
+          name={tab.name}
+          component={tab.component}
+          options={{
+            tabBarIcon: ({ focused }) => (
+              <TabBarIcon
+                emoji={tab.emoji}
+                label={tab.label}
+                focused={focused}
+                activeColor={theme.tabBarActive}
+                activeShadow={theme.shadowPrimary}
+              />
+            ),
+          }}
+        />
+      ))}
     </Tab.Navigator>
   );
 }
