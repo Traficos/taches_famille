@@ -1,9 +1,9 @@
 import React, { useCallback, useState } from 'react';
-import { View, Text, StyleSheet, SectionList } from 'react-native';
+import { View, Text, StyleSheet, FlatList } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { useProfile } from '../../context/ProfileContext';
 import { useTheme } from '../../context/ThemeContext';
-import { getRealRewards, getAccessoryRewards, purchaseReward, getAccessoriesOwned, Reward } from '../../api/rewards';
+import { getRealRewards, purchaseReward, Reward } from '../../api/rewards';
 import { updateChildPoints, getProfileById } from '../../api/profiles';
 import PointsBadge from '../../components/PointsBadge';
 import ShopItem from '../../components/ShopItem';
@@ -14,15 +14,11 @@ export default function ShopScreen() {
   const { currentProfile, setCurrentProfile } = useProfile();
   const theme = useTheme();
   const [realRewards, setRealRewards] = useState<Reward[]>([]);
-  const [accessoryRewards, setAccessoryRewards] = useState<Reward[]>([]);
-  const [ownedAccessories, setOwnedAccessories] = useState<string[]>([]);
   const [celebration, setCelebration] = useState<number | null>(null);
 
   const loadShop = useCallback(async () => {
     if (!currentProfile) return;
     setRealRewards(await getRealRewards());
-    setAccessoryRewards(await getAccessoryRewards());
-    setOwnedAccessories(await getAccessoriesOwned(currentProfile.id));
   }, [currentProfile?.id]);
 
   useFocusEffect(useCallback(() => { loadShop(); }, [loadShop]));
@@ -39,11 +35,6 @@ export default function ShopScreen() {
 
   if (!currentProfile) return null;
 
-  const sections = [
-    { title: '🎁 Recompenses', data: realRewards },
-    { title: '🎀 Accessoires pour ton animal', data: accessoryRewards },
-  ];
-
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
       {celebration !== null && (
@@ -53,37 +44,23 @@ export default function ShopScreen() {
         <Text style={styles.title}>🛍️ Boutique</Text>
         <PointsBadge points={currentProfile.current_points} />
       </View>
-      <SectionList
-        sections={sections}
+      <Text style={styles.sectionTitle}>🎁 Recompenses</Text>
+      <FlatList
+        data={realRewards}
         keyExtractor={item => String(item.id)}
-        renderSectionHeader={({ section }) => (
-          <Text style={styles.sectionTitle}>{section.title}</Text>
+        renderItem={({ item }) => (
+          <ShopItem
+            name={item.name}
+            emoji="🎁"
+            cost={item.cost}
+            canAfford={currentProfile.current_points >= item.cost}
+            owned={false}
+            onBuy={() => handleBuy(item)}
+          />
         )}
-        renderItem={({ item }) => {
-          const isAccessory = item.type === 'accessory';
-          const owned = isAccessory && item.accessory_key ? ownedAccessories.includes(item.accessory_key) : false;
-          return (
-            <ShopItem
-              name={item.name}
-              emoji={isAccessory ? getAccessoryEmoji(item.accessory_key) : '🎁'}
-              cost={item.cost}
-              canAfford={currentProfile.current_points >= item.cost}
-              owned={owned}
-              onBuy={() => handleBuy(item)}
-            />
-          );
-        }}
       />
     </View>
   );
-}
-
-function getAccessoryEmoji(key: string | null): string {
-  const map: Record<string, string> = {
-    hat: '🎩', glasses: '🕶️', bow: '🎀', crown: '👑', necklace: '📿',
-    scarf: '🧣', cape: '🦸', flower: '🌸', star: '⭐', heart: '❤️',
-  };
-  return key ? map[key] ?? '✨' : '🎁';
 }
 
 const styles = StyleSheet.create({
